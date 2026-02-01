@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cupid's Mission</title>
     <style>
-        /* Hides real cursor and sets up the emoji cursor */
         * { cursor: none !important; } 
 
         body {
@@ -16,21 +15,18 @@
             justify-content: center;
             align-items: center;
             margin: 0;
-            color: #2E2E2E; /* Charcoal Soft Black */
+            color: #2E2E2E;
             overflow: hidden;
         }
 
-        /* Cupid Cursor - Using Emoji for 100% Reliability */
         #cupid-cursor {
             position: fixed;
-            font-size: 50px;
+            width: 80px;
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.2));
         }
 
-        /* Humorous Shuffling Reaction Text */
         #cursor-talk {
             position: fixed;
             font-size: 14px;
@@ -38,46 +34,42 @@
             z-index: 9998;
             color: #2E2E2E;
             background: #A9D6E5; /* Sky Blue */
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 10px 18px;
+            border-radius: 25px;
             font-weight: bold;
             display: none;
             white-space: nowrap;
-            box-shadow: 4px 4px 15px rgba(0,0,0,0.1);
-            transform: translate(20px, -40px);
+            box-shadow: 4px 6px 15px rgba(0,0,0,0.1);
         }
 
         .card {
             background: #EFB7C4; /* Blush Rose */
-            padding: 40px;
-            border-radius: 30px;
+            padding: 50px;
+            border-radius: 40px;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(107, 79, 79, 0.1);
-            border: 5px solid #A9D6E5; /* Sky Blue */
+            box-shadow: 0 20px 50px rgba(107, 79, 79, 0.1);
+            border: 6px solid #A9D6E5;
             max-width: 450px;
             z-index: 10;
         }
-
-        h1 { font-size: 2.2rem; margin-bottom: 10px; color: #2E2E2E; }
-        p { color: #6B4F4F; font-size: 1.1rem; margin-bottom: 25px; }
 
         .btn-container {
             display: flex;
             justify-content: center;
             gap: 25px;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         button {
-            font-size: 18px;
-            padding: 12px 35px;
+            font-size: 20px;
+            padding: 15px 40px;
             border: none;
             border-radius: 50px;
             font-weight: bold;
-            transition: 0.1s;
+            pointer-events: auto; /* Ensures buttons are clickable */
         }
 
-        #yes { background-color: #FF6F61; color: white; box-shadow: 0 4px 10px rgba(255,111,97,0.3); }
+        #yes { background-color: #FF6F61; color: white; cursor: none; }
         #no { background-color: #F4D35E; color: #2E2E2E; position: relative; }
 
         .falling-item {
@@ -91,7 +83,7 @@
 </head>
 <body>
 
-    <div id="cupid-cursor">🏹</div>
+    <img id="cupid-cursor" src="image_24d0a1.png">
     <div id="cursor-talk"></div>
 
     <audio id="romanticMusic" loop>
@@ -99,37 +91,25 @@
     </audio>
 
     <div class="card" id="mainCard">
-        <div style="font-size: 80px; margin-bottom: 10px;">👼</div>
+        <img src="image_24d0a1.png" width="100" style="margin-bottom: 15px;">
         <h1>Hey [Name]! ❤️</h1>
-        <p>Cupid has a target on your heart...<br>Will you be my Valentine?</p>
+        <p>You've been targeted by Cupid...<br><strong>Will you be my Valentine?</strong></p>
         
         <div class="btn-container">
-            <button id="yes" onclick="sayYes()">YES!</button>
-            <button id="no" onmouseover="handleNoMove()">No way</button>
+            <button id="yes">YES!</button>
+            <button id="no">No way</button>
         </div>
     </div>
 
     <script>
         const cursor = document.getElementById('cupid-cursor');
         const talk = document.getElementById('cursor-talk');
+        const yesBtn = document.getElementById('yes');
         const noBtn = document.getElementById('no');
         
-        const reactions = [
-            "Nice dodge! Cupid is faster!",
-            "Error 404: Rejection not found!",
-            "Aiming... missed! Try again!",
-            "You're playing hard to get, huh?",
-            "Friendzone detected! Aborting!",
-            "That's a weird way to click YES!",
-            "My arrows are getting tired!",
-            "Cupid says: 'Don't be like that!'",
-            "Stop running! Love is coming!",
-            "Is your mouse broken? Click the RED one!"
-        ];
+        const reactions = ["Nice try!", "Error: NO button broken!", "Aiming again!", "Click the RED one!"];
 
-        let talkTimeout;
-
-        // Smooth Cursor Movement
+        // Movement logic
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
@@ -137,69 +117,53 @@
             talk.style.top = e.clientY + 'px';
 
             const rect = noBtn.getBoundingClientRect();
-            const btnX = rect.left + rect.width / 2;
-            const btnY = rect.top + rect.height / 2;
-            
-            const distance = Math.sqrt(Math.pow(e.clientX - btnX, 2) + Math.pow(e.clientY - btnY, 2));
+            const distance = Math.sqrt(Math.pow(e.clientX - (rect.left + rect.width/2), 2) + Math.pow(e.clientY - (rect.top + rect.height/2), 2));
 
-            // Trigger escape if Cupid gets close
-            if(distance < 120) {
-                showReaction();
-                handleNoMove();
+            if(distance < 100) {
+                talk.style.display = 'block';
+                talk.innerText = reactions[Math.floor(Math.random()*reactions.length)];
+                moveNo();
             }
         });
 
-        function showReaction() {
-            clearTimeout(talkTimeout);
-            talk.style.display = 'block';
-            if(!talk.innerText || Math.random() > 0.8) {
-                talk.innerText = reactions[Math.floor(Math.random()*reactions.length)];
-            }
-            talkTimeout = setTimeout(() => { talk.style.display = 'none'; }, 2000);
-        }
-
-        function handleNoMove() {
+        function moveNo() {
             noBtn.style.position = "absolute"; 
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 100);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 100);
-            noBtn.style.left = Math.max(20, x) + "px";
-            noBtn.style.top = Math.max(20, y) + "px";
+            noBtn.style.left = Math.random() * (window.innerWidth - 150) + "px";
+            noBtn.style.top = Math.random() * (window.innerHeight - 100) + "px";
         }
 
-        function sayYes() {
+        // INSTANT CLICK LOGIC
+        yesBtn.addEventListener('click', () => {
             const music = document.getElementById("romanticMusic");
-            music.play().catch(e => console.log("Audio waiting for interaction"));
+            music.play();
             
             document.body.style.backgroundColor = "#EFB7C4";
             document.body.innerHTML = `
-                <div id="cupid-cursor" style="position:fixed; font-size:60px; pointer-events:none; transform:translate(-50%,-50%); z-index:9999;">💘</div>
+                <div id="cupid-cursor" style="position:fixed; font-size:60px; pointer-events:none; transform:translate(-50%,-50%); z-index:9999;">💖</div>
                 <div style="text-align:center; color:#2E2E2E; width: 100%;">
                     <h1 style="font-size: 4rem;">BULLSEYE! 🎯</h1>
                     <p style="font-size: 1.5rem;">Happy Valentine's Day! ❤️</p>
-                    <div style="font-size: 100px; margin-top: 20px;">🌹</div>
-                </div>
-            `;
+                    <div style="font-size: 100px; margin-top: 20px;">🌹✨</div>
+                </div>`;
             
-            // Re-enable cursor follow for the success screen
             const newCursor = document.getElementById('cupid-cursor');
-            document.addEventListener('mousemove', (e) => {
-                newCursor.style.left = e.clientX + 'px';
-                newCursor.style.top = e.clientY + 'px';
+            document.addEventListener('mousemove', (m) => {
+                newCursor.style.left = m.clientX + 'px';
+                newCursor.style.top = m.clientY + 'px';
             });
-
-            setInterval(spawnItems, 200);
-        }
+            setInterval(spawnItems, 150);
+        });
 
         function spawnItems() {
             const item = document.createElement("div");
             item.classList.add("falling-item");
-            item.innerHTML = ["🏹", "💘", "🌸", "🌹"][Math.floor(Math.random() * 4)];
+            item.innerHTML = "💘";
             item.style.left = Math.random() * 100 + "vw";
             item.style.top = "-50px";
-            item.style.fontSize = (Math.random() * 20 + 20) + "px";
-            item.style.animationDuration = (Math.random() * 2 + 3) + "s";
+            item.style.fontSize = "30px";
+            item.style.animationDuration = "3s";
             document.body.appendChild(item);
-            setTimeout(() => item.remove(), 5000);
+            setTimeout(() => item.remove(), 4000);
         }
     </script>
 </body>
